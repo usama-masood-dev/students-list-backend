@@ -10,9 +10,9 @@ import verifyToken from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", getStudents);
+router.get("/", verifyToken, getStudents);
 
-router.get("/:id", getStudentById);
+router.get("/:id", verifyToken, getStudentById);
 
 router.post("/", verifyToken, addStudent);
 

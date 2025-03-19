@@ -3,9 +3,24 @@ import Student from "../models/studentModel.js";
 // Get all students
 export const getStudents = async (req, res) => {
   try {
-    console.log("testing");
-    const students = await Student.find({});
-    res.json(students);
+    // Pagination
+    let { page, limit } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+
+    const skip = (page - 1) * limit;
+
+    const students = await Student.find().skip(skip).limit(limit);
+
+    const totalStudents = await Student.countDocuments();
+
+    res.json({
+      students,
+      currentPage: page,
+      totalPages: Math.ceil(totalStudents / limit),
+      totalStudents,
+    });
+    
   } catch (error) {
     console.log("error 12345", error);
     res.status(500).json({ error: error.message });
@@ -59,7 +74,7 @@ export const updateStudent = async (req, res) => {
     );
 
     res
-      .status(401)
+      .status(200)
       .json({ message: "Student updated", student: updatedStudent });
   } catch (error) {
     res.status(500).json({ error: error.message });
