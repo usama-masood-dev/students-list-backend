@@ -31,8 +31,13 @@ const StudentSchema = new mongoose.Schema({
     },
     required: [true, "Course is required!"],
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
-const Student = mongoose.model('Student', StudentSchema)
+const Student = mongoose.model("Student", StudentSchema);
 
 export default Student;

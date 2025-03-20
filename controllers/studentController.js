@@ -3,6 +3,11 @@ import Student from "../models/studentModel.js";
 // Get all students
 export const getStudents = async (req, res) => {
   try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
     // Pagination
     let { page, limit } = req.query;
     page = parseInt(page) || 1;
@@ -10,9 +15,9 @@ export const getStudents = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-    const students = await Student.find().skip(skip).limit(limit);
+    const students = await Student.find({ userId }).skip(skip).limit(limit);
 
-    const totalStudents = await Student.countDocuments();
+    const totalStudents = await Student.countDocuments({ userId });
 
     res.json({
       students,
@@ -20,9 +25,8 @@ export const getStudents = async (req, res) => {
       totalPages: Math.ceil(totalStudents / limit),
       totalStudents,
     });
-    
   } catch (error) {
-    console.log("error 12345", error);
+    console.log("Error fetching students data", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -48,12 +52,13 @@ export const getStudentById = async (req, res) => {
 // Create new Student
 export const addStudent = async (req, res) => {
   try {
-    const { fullName, fatherName, contactNumber, course } = req.body;
+    const { fullName, fatherName, contactNumber, course, userId } = req.body;
     const newStudent = new Student({
       fullName,
       fatherName,
       contactNumber,
       course,
+      userId,
     });
     await newStudent.save();
     res.status(201).json({ newStudent: newStudent });
