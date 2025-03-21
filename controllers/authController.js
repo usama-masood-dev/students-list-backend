@@ -2,21 +2,9 @@ import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { configDotenv } from "dotenv";
+import sendMail from "../services/mailService.js";
 
 configDotenv();
-
-export const getUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json(user);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
 
 export const signup = async (req, res) => {
   try {
@@ -29,9 +17,18 @@ export const signup = async (req, res) => {
     // Create User
     user = new User({ fullName, email, password });
     await user.save();
+    console.log("User saved to database");
+
+    await sendMail(
+      email,
+      "Welcome to Our App!",
+      `Hello ${fullName}, welcome to our app!`,
+      `<h2>Hello ${fullName},</h2><p>We're glad to have you here.</p>`
+    );
 
     res.status(201).json({ message: "User created successfully!" });
   } catch (error) {
+    console.error("Signup Error:", error);
     res.status(500).json({ error: error.message });
   }
 };

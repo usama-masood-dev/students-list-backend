@@ -3,7 +3,8 @@ import Student from "../models/studentModel.js";
 // Get all students
 export const getStudents = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const userId = req.user.id;
+    console.log(userId);
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
     }
@@ -52,13 +53,16 @@ export const getStudentById = async (req, res) => {
 // Create new Student
 export const addStudent = async (req, res) => {
   try {
-    const { fullName, fatherName, contactNumber, course, userId } = req.body;
+    const userId = req.user.id;
+    const { fullName, fatherName, contactNumber, course } = req.body;
     const newStudent = new Student({
       fullName,
       fatherName,
       contactNumber,
       course,
       userId,
+      createdAt: Math.floor(Date.now() / 1000),
+      updatedAt: Math.floor(Date.now() / 1000),
     });
     await newStudent.save();
     res.status(201).json({ newStudent: newStudent });
@@ -74,7 +78,13 @@ export const updateStudent = async (req, res) => {
 
     const updatedStudent = await Student.findByIdAndUpdate(
       req.params.id,
-      { fullName, fatherName, contactNumber, course },
+      {
+        fullName,
+        fatherName,
+        contactNumber,
+        course,
+        updatedAt: Math.floor(Date.now() / 1000),
+      },
       { new: true }
     );
 

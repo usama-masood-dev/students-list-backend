@@ -36,6 +36,8 @@ const StudentSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  createdAt: { type: Number, default: () => Math.floor(Date.now() / 1000) },
+  updatedAt: { type: Number, default: () => Math.floor(Date.now() / 1000) },
 });
 
 const Student = mongoose.model("Student", StudentSchema);
